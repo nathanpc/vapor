@@ -1,0 +1,11 @@
+{
+  "name": "vapor",
+  "version": "1.0",
+  "dependencies": {
+    "irc": "0.x"
+  },
+  "engines": {
+    "node": "0.x",
+    "npm": "1.x"
+  }
+}
