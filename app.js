@@ -5,18 +5,28 @@
   irc = require("irc");
 
   settings = {
-    server: "irc.prison.net",
+    server: "irc.servercentral.net",
     channel: "#dreamincode",
-    nick: "Vapor"
+    nick: "Vapor",
+    admin: "nathanpc"
   };
 
   client = new irc.Client(settings.server, settings.nick, {
     channels: [settings.channel],
+    userName: settings.nick,
+    realName: settings.nick,
+    showErrors: true,
     debug: true
   });
 
   client.addListener("connect", function() {
-    return client.say(settings.channel, "Hello, I'm just another bot! :P");
+    return console.log("Connected.");
+  });
+
+  client.addListener("join", function(channel, nick, msg) {
+    if (nick === settings.nick) {
+      return client.say(channel, "Hello, I'm just another bot! :P");
+    }
   });
 
   client.addListener("message" + settings.channel, function(nick, msg) {
@@ -24,7 +34,16 @@
   });
 
   client.addListener("pm", function(from, msg) {
-    return console.log("PM <" + from + "> " + msg);
+    if (from === settings.admin) {
+      this.command = msg.split(" ")[0];
+      console.log("ADMIN <" + from + "> COMMAND: " + msg);
+      switch (this.command) {
+        case "say":
+          return client.say(settings.channel, msg.split(" ").slice(1).join(" "));
+      }
+    } else {
+      return console.log("PM <" + from + "> " + msg);
+    }
   });
 
 }).call(this);
