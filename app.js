@@ -46,7 +46,7 @@
   client.addListener("message" + settings.channel, function(nick, msg) {
     if (msg[0] === "@") {
       this.command = msg.split(" ")[0].slice(1);
-      console.log(color("<" + nick + "> COMMAND:", "yellow"), "" + msg);
+      console.log(color("<" + nick + "> COMMAND:", "cyan"), "" + msg);
       switch (this.command) {
         case "random":
           this.arg = msg.split(" ")[1];

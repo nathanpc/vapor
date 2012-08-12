@@ -40,7 +40,7 @@ client.addListener "message" + settings.channel, (nick, msg) ->
     if msg[0] is "@"
         @command = msg.split(" ")[0].slice(1)
 
-        console.log color("<#{nick}> COMMAND:", "yellow"), "#{msg}"
+        console.log color("<#{nick}> COMMAND:", "cyan"), "#{msg}"
         
         switch @command
             when "random"
