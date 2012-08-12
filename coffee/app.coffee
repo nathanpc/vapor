@@ -1,4 +1,5 @@
 irc = require "irc"
+color = require("ansi-color").set
 
 # Modules
 crypt_hash = require "./modules/crypt_hash.js"
@@ -9,17 +10,17 @@ settings =
     channel: "#dreamincode"
     nick: "Vapor"
     admin: "nathanpc"
-    welcome: "Fuck this shit. I'm fucking awesome."
+    welcome: "Vapor Bot by nathanpc <http://github.com/nathanpc/vapor>"
 
 client = new irc.Client settings.server, settings.nick,
     channels: [ settings.channel ]
     userName: settings.nick
     realName: settings.nick
     showErrors: true
-    debug: true
+    #debug: true
 
 client.addListener "connect", ->
-    console.log "Connected."
+    console.log color("STATUS: ", "bold"), color("Connected to #{settings.server}", "green")
 
 client.addListener "join", (channel, nick, msg) ->
     if nick is settings.nick
@@ -28,16 +29,18 @@ client.addListener "join", (channel, nick, msg) ->
             client.say settings.channel, settings.welcome
     else
         # User joined.
-        console.log "JOIN <#{channel}>: #{nick}"
+        console.log color("JOIN <#{channel}>: #{nick}", "blue+bold")
 
 client.addListener "part", (channel, nick, msg) ->
     # User parted.
-    console.log "PART <#{channel}>: #{nick}"
+    console.log color("PART <#{channel}>: #{nick}", "blue+bold")
 
 client.addListener "message" + settings.channel, (nick, msg) ->
     # Check if it's a command or not.
     if msg[0] is "@"
         @command = msg.split(" ")[0].slice(1)
+
+        console.log color("<#{nick}> COMMAND:", "yellow"), "#{msg}"
         
         switch @command
             when "random"
@@ -54,13 +57,13 @@ client.addListener "message" + settings.channel, (nick, msg) ->
                 @md5 = crypt_hash.md5 msg.split(" ").slice(1).join(" ")
                 client.say settings.channel, @md5
     else
-        console.log "<#{nick}> #{msg}"
+        console.log color("<#{nick}>", "yellow"), "#{msg}"
 
 client.addListener "pm", (from, msg) ->
     # Check it it's a admin command
     if from is settings.admin
         @command = msg.split(" ")[0]
-        console.log "<#{from}> COMMAND: #{msg}"
+        console.log color("<#{from}> COMMAND:", "magenta"), "#{msg}"
 
         switch @command
             when "say"
@@ -70,4 +73,4 @@ client.addListener "pm", (from, msg) ->
                     process.exit 0
     else
         client.say from, "Unauthorized Command."
-        console.log "UNAUTHORIZED PM: <#{from}> #{msg}"
+        console.log color("UNAUTHORIZED PM:", "red+bold"), "<#{from}> #{msg}"

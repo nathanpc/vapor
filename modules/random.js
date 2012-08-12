@@ -2,11 +2,13 @@
 (function() {
 
   module.exports.string = function(size) {
-    var chars, random, s, _i, _len;
+    var chars, random, s, _i;
     chars = "abcdefghiklmnopqrstuvwxyz1234567890ABCDEFGHIKLMNOPQRSTUVWXYZ";
     random = "";
-    for (_i = 0, _len = size.length; _i < _len; _i++) {
-      s = size[_i];
+    if (size >= 100) {
+      size = 100;
+    }
+    for (s = _i = 1; 1 <= size ? _i <= size : _i >= size; s = 1 <= size ? ++_i : --_i) {
       this.rnum = Math.floor(Math.random() * chars.length);
       random += chars.substring(this.rnum, this.rnum + 1);
     }

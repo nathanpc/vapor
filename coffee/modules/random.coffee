@@ -4,8 +4,11 @@
 module.exports.string = (size) ->
     chars = "abcdefghiklmnopqrstuvwxyz1234567890ABCDEFGHIKLMNOPQRSTUVWXYZ"
     random = ""
+    
+    if size >= 100
+        size = 100
 
-    for s in size
+    for s in [1 .. size]
         @rnum = Math.floor Math.random() * chars.length
         random += chars.substring @rnum, @rnum + 1
 
