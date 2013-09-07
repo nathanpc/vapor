@@ -80,7 +80,7 @@ sub parse_msg {
 				$html->parse($content);
 
 				my $title = $html->header("Title");
-				chomp $title;
+				$title =~ s/[\r\n]+$//;
 
 				irc_send("PRIVMSG $channel :^ $title");
 			}
