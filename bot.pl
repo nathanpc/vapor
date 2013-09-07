@@ -11,6 +11,9 @@ use warnings;
 use Data::Dumper;
 
 use IO::Socket;
+use URI::Find;
+use LWP::Simple;
+use HTML::HeadParser;
 
 # Properties.
 my $server = "localhost";
@@ -54,6 +57,35 @@ sub irc_connect {
 	}
 }
 
+# Gets the message.
+sub strip_msg {
+	my ($msg) = @_;
+
+	$msg =~ s/^:.*? ://;
+	return $msg;
+}
+
+# Interprets a message.
+sub parse_msg {
+	my ($msg) = @_;
+
+	my $finder = URI::Find->new(sub {
+		my($url) = @_;
+		if ($url =~ /^(http)|(https)/i) {
+			# Get the page content.
+			my $content = get($url);
+			if (defined $content) {
+				# Parse the title and send it to the channel.
+				my $html = HTML::HeadParser->new;
+				$html->parse($content);
+
+				irc_send("PRIVMSG $channel :^ " . $html->header("Title"));
+			}
+		}
+	});
+	$finder->find(\$msg);
+}
+
 # Main.
 irc_connect();
 irc_send("JOIN $channel");
@@ -61,7 +93,7 @@ irc_send("JOIN $channel");
 # IRC loop.
 while (my $msg = <$socket>) {
 	# Remove the crap.
-	chop $msg;
+	chomp $msg;
 
 	if ($msg =~ /^PING(.*)$/i) {
 		irc_send("PONG $1");
@@ -69,7 +101,7 @@ while (my $msg = <$socket>) {
 		# Makes sure this is a message from the selected channel.
 		my @values = split(" ", $msg);
 		if ("$values[1] $values[2]" eq "PRIVMSG $channel") {
-			print "$msg\n";
+			parse_msg(strip_msg($msg));
 		}
 	}
 }
