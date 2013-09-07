@@ -16,10 +16,10 @@ use LWP::Simple;
 use HTML::HeadParser;
 
 # Properties.
-my $server = "localhost";
+my $server = "irc.freenode.net";
 my $nick = "vapor";
 my $username = "Vapor";
-my $channel = "#home";
+my $channel = "##dreamincode";
 
 # Other variables.
 my $socket;
@@ -79,7 +79,10 @@ sub parse_msg {
 				my $html = HTML::HeadParser->new;
 				$html->parse($content);
 
-				irc_send("PRIVMSG $channel :^ " . $html->header("Title"));
+				my $title = $html->header("Title");
+				chomp $title;
+
+				irc_send("PRIVMSG $channel :^ $title");
 			}
 		}
 	});
