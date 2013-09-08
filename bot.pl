@@ -80,6 +80,9 @@ sub parse_msg {
 				$html->parse($content);
 
 				my $title = $html->header("Title");
+				if (!defined($title) or $title eq '') {
+					return;
+				}
 				$title =~ s/[\r\n]+$//;
 
 				irc_send("PRIVMSG $channel :^ $title");
