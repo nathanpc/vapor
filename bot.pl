@@ -41,6 +41,7 @@ sub irc_connect {
 									   die "Couldn't connect to server\n";
 	print "[INFO] Connected to $server\n";
 
+SEND_NICK:
 	# Log in.
 	irc_send("NICK $nick");
 	irc_send("USER $username 8 * :IRCLog bot for $channel");
@@ -52,7 +53,9 @@ sub irc_connect {
 			print "[INFO] Logged in as $nick\n";
 			last;
 		} elsif ($msg =~ /433/) {
-			die "[ERROR] Nickname is already in use\n";
+			print "[INFO] Nickname '$nick' is already in use, trying another one\n";
+			$nick .= "_";
+			goto SEND_NICK;
 		}
 	}
 }
