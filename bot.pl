@@ -41,21 +41,24 @@ sub irc_connect {
 									   die "Couldn't connect to server\n";
 	print "[INFO] Connected to $server\n";
 
-SEND_NICK:
 	# Log in.
-	irc_send("NICK $nick");
-	irc_send("USER $username 8 * :IRCLog bot for $channel");
+	my $not_logged = 1;
+	while ($not_logged) {
+		irc_send("NICK $nick");
+		irc_send("USER $username 8 * :IRCLog bot for $channel");
+		
+		# Read lines until we have logged in.
+		while (my $msg = <$socket>) {
+			if ($msg =~ /004/) {
+				# Logged in.
+				print "[INFO] Logged in as $nick\n";
+				$not_logged = 0;
 
-	# Read lines until we have logged in.
-	while (my $msg = <$socket>) {
-		if ($msg =~ /004/) {
-			# Logged in.
-			print "[INFO] Logged in as $nick\n";
-			last;
-		} elsif ($msg =~ /433/) {
-			print "[INFO] Nickname '$nick' is already in use, trying another one\n";
-			$nick .= "_";
-			goto SEND_NICK;
+				last;
+			} elsif ($msg =~ /433/) {
+				print "[INFO] Nickname '$nick' is already in use, trying another one\n";
+				$nick .= "_";
+			}
 		}
 	}
 }
